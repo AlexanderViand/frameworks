@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 # Number of seperate nodes (=machines), including the aggregator (always highest id) but not the seed node
-NODES=4
+NODES=8
 
 # do not modify!
 INPUT=$((NODES-1))
@@ -91,10 +91,9 @@ do
 done
 printf "    private int<4> s1[10];\n" >> pate.c
 printf "    s1 = v1 + v2;\n" >> pate.c
-for (( ID=3; ID<=$NODES;  $ID++ ))
+for (( ID=3; ID<=$NODES;  ID+=2 ))
 do    
     printf "    s1 = v$(($ID)) + v$(($ID+1));\n" >> pate.c
-    $(($ID++)) #TODO: FIX THIS
 done
 
 
