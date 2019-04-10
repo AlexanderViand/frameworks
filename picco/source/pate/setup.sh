@@ -98,9 +98,9 @@ do
 done
 
 
-printf "private int<4> max = 0;\n    for(public int i = 0; i < 10; i++)\n        if(s1[i] > max) max = s1[i];\n" >> pate.c
+printf "    private int<4> max = 0;\n    for(public int i = 0; i < 10; i++)\n        if(s1[i] > max) max = s1[i];\n" >> pate.c
 printf "    private int<4> b;\n    if (max > 8) {\n        b = 1;\n    } else {\n        b = 0;\n    }\n" >> pate.c
-printf "    smcoutput(b,1);\n    return 0;\n" >> pate.c
+printf "    smcoutput(b,1);\n    return 0;\n}\n" >> pate.c
 
 
 echo "Transpiling code"
