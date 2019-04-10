@@ -16,7 +16,8 @@ TEACHERS=250
 TEACHERS_PER_NODE=$(( $TEACHERS / $NODES ))
 
 echo "Deleting old deployment"
-rm -rf deployment
+pkill -f pategen
+rm -rf deployment   
 
 echo "Setting up $NODES nodes."
 mkdir -p deployment
@@ -59,7 +60,7 @@ do
     # Setting up run_config
     for (( I=1; I<=$NODES; I++ ))
     do
-        printf "$I,127.0.0.1,$(($PORT+$I)),keys/pubkey$I.pem\n" > run_config
+        printf "$I,127.0.0.1,$(($PORT+$I)),keys/pubkey$I.pem\n" >> run_config
         #TODO: Make them use real ips rather than localhost
     done
     cd .. #back to deployment
@@ -146,6 +147,9 @@ cd .. #back to deployment
 
 echo "Recovering output"
 #TODO
+
+
+read -p "Press any key to clean up..."
 
 echo "Killing any leftover processes"
 pkill -f pategen
