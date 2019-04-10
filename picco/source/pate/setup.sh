@@ -55,7 +55,7 @@ do
     cd node$ID
 
     # Setting up smc_config
-    printf "modulus:48\ncomp-parties:$NODES\nthreshold:$(( ($NODES / 2 ) - 1 ))\ninput-parties:$INPUT\noutput-parties:$OUTPUT\n" > smc_config
+    printf "modulus:60\ncomp-parties:$NODES\nthreshold:$(( ($NODES / 2 ) - 1 ))\ninput-parties:$INPUT\noutput-parties:$OUTPUT\n" > smc_config
 
     # Setting up run_config
     for (( I=1; I<=$NODES; I++ ))
@@ -69,7 +69,7 @@ done
 for (( ID=1; ID<=$INPUT; ID++ ))
 do    
     cd node$ID
-    # Setting up input, hardcoded to ten classes
+    # Setting up input, hardcoded to ten classes for now
     echo "v$ID = 1,0,0,0,0,0,0,0,0,0\n" > input
     #TODO: Make vote random, or read it from file    
     cd .. #back to deployment
@@ -77,29 +77,7 @@ done
 
 
 echo "Frankensteinifing the source code for the appropriate number of nodes"
-printf "public int main() {\n" > pate.c
-printf "    private int<4> v1[10]" >> pate.c
-for (( ID=2; ID<=$NODES; ID++ ))
-do    
-    printf ", v$(($ID))[10]" >> pate.c
-done
-printf ";\n" >> pate.c
-for (( ID=1; ID<=$NODES; ID++ ))
-do    
-    printf "    smcinput(v$(($ID)),$(($ID)),10);\n" >> pate.c
-done
-printf "    private int<4> s1[10];\n" >> pate.c
-printf "    s1 = v1 + v2;\n" >> pate.c
-for (( ID=3; ID<=$NODES;  $ID++ ))
-do    
-    printf "    s1 = v$(($ID)) + v$(($ID+1));\n" >> pate.c
-    $(($ID++))
-done
-printf "    smcoutput(s1,1,10);\n    return 0;\n" >> pate.c
-
-
-#TODO in next part, actually use THIS pate rather than the hadnwritten one!
-
+#TODO: ACTUALLY DO THIS!
 
 echo "Transpiling code"
 for (( ID=1; ID<=$NODES; ID++ ))
@@ -167,6 +145,9 @@ cp -rp keys seed_node
 cp node1/run_config seed_node/run_config
 cp node1/util_config seed_node/util_config
 cd seed_node
+
+exit 0
+
 picco-seed run_config util_config
 cd .. #back to deployment
 

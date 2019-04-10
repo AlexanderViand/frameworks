@@ -20,7 +20,7 @@ public int main() {
     // smcinput(v10,10,10);
 
     private int<4> s1[10];
-    s1 = v1 + v2; #first line must be addition, rather than pure assignment, otherwise it segfaults in transpilation
+    s1 = v1 + v2; //first line must be addition, rather than pure assignment, otherwise it segfaults in transpilation
     s1 = s1 + v3;
     // s1 = s1 + v4;
     // s1 = s1 + v5;
@@ -32,24 +32,19 @@ public int main() {
 
     
     private int<4> max = 0;
-    for(int i = 0; i < 10; i++) {
-        if(s1[i] > max) {
-            max = s1[i];
-        }
+    for(public int i = 0; i < 10; i++) 
+        if(s1[i] > max) max = s1[i];
+
+    //TODO: Add noise!
+
+    private int<4> b;
+    if (max > 8) {
+        b = 1;
+    } else {
+        b = 0;
     }
 
-    //TODO: "Real" noise!
-    //private float max_with_noise = max + 1.416
-
-
-    
-    
-    
-    
-    
-    
-    
-    smcoutput(max,1,10);
+    smcoutput(b,1);
 
 
 
