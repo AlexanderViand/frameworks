@@ -170,7 +170,7 @@ cp node1/run_config seed_node/run_config
 cp node1/util_config seed_node/util_config
 cd seed_node
 
-echo "Run cd /deployment/seed_node and then picco-seed run_config util_config to start the computation"
+echo "Run cd deployment/seed_node and then picco-seed run_config util_config to start the computation"
 exit 0
 
 picco-seed run_config util_config
