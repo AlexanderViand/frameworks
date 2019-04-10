@@ -49,6 +49,7 @@ do
 done
 
 
+#TODO: Calculate modulus required for if/else?
 echo "Setting up configs"
 for (( ID=1; ID<=$NODES; ID++ ))
 do    
@@ -69,7 +70,7 @@ done
 for (( ID=1; ID<=$INPUT; ID++ ))
 do    
     cd node$ID
-    # Setting up input, hardcoded to ten classes for now
+    # Setting up input, hardcoded to ten classes 
     echo "v$ID = 1,0,0,0,0,0,0,0,0,0\n" > input
     #TODO: Make vote random, or read it from file    
     cd .. #back to deployment
@@ -77,12 +78,35 @@ done
 
 
 echo "Frankensteinifing the source code for the appropriate number of nodes"
-#TODO: ACTUALLY DO THIS!
+printf "public int main() {\n" > pate.c
+printf "    private int<4> v1[10]" >> pate.c
+for (( ID=2; ID<=$NODES; ID++ ))
+do    
+    printf ", v$(($ID))[10]" >> pate.c
+done
+printf ";\n" >> pate.c
+for (( ID=1; ID<=$NODES; ID++ ))
+do    
+    printf "    smcinput(v$(($ID)),$(($ID)),10);\n" >> pate.c
+done
+printf "    private int<4> s1[10];\n" >> pate.c
+printf "    s1 = v1 + v2;\n" >> pate.c
+for (( ID=3; ID<=$NODES;  $ID++ ))
+do    
+    printf "    s1 = v$(($ID)) + v$(($ID+1));\n" >> pate.c
+    $(($ID++))
+done
+
+
+printf "private int<4> max = 0;\n    for(public int i = 0; i < 10; i++)\n        if(s1[i] > max) max = s1[i];\n" >> pate.c
+printf "    private int<4> b;\n    if (max > 8) {\n        b = 1;\n    } else {\n        b = 0;\n    }\n" >> pate.c
+printf "    smcoutput(b,1);\n    return 0;\n" >> pate.c
+
 
 echo "Transpiling code"
 for (( ID=1; ID<=$NODES; ID++ ))
 do    
-    cp ../pate.c node$ID/pate.c
+    cp pate.c node$ID/pate.c
     cd node$ID
     picco pate.c smc_config pategen util_config     
     cd .. #back to deployment
@@ -139,13 +163,14 @@ do
     cd .. #back to deployment
 done
 
-echo "Start seed"
+echo "Setting up seed"
 mkdir -p seed_node
 cp -rp keys seed_node
 cp node1/run_config seed_node/run_config
 cp node1/util_config seed_node/util_config
 cd seed_node
 
+echo "Run cd /deployment/seed_node and then picco-seed run_config util_config to start the computation"
 exit 0
 
 picco-seed run_config util_config
@@ -153,7 +178,6 @@ cd .. #back to deployment
 
 echo "Recovering output"
 #TODO
-
 
 read -p "Press any key to clean up..."
 

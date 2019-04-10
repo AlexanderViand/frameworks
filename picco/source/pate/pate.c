@@ -43,11 +43,8 @@ public int main() {
     } else {
         b = 0;
     }
-
+    
     smcoutput(b,1);
-
-
-
     return 0;
 
 }
