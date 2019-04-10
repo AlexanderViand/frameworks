@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 # Number of seperate nodes (=machines), including the aggregator (always highest id) but not the seed node
-NODES=11
+NODES=4
 
 # do not modify!
 INPUT=$((NODES-1))
@@ -45,7 +45,7 @@ done
 # Copy public keys down
 for (( ID=1; ID<=$NODES; ID++ ))
 do  
-    cp -r keys node$ID        
+    cp -rp keys node$ID        
 done
 
 
@@ -141,6 +141,9 @@ done
 
 echo "Start seed"
 mkdir -p seed_node
+cp -rp keys seed_node
+cp node1/run_config seed_node/run_config
+cp node1/util_config seed_node/util_config
 cd seed_node
 picco-seed run_config util_config
 cd .. #back to deployment
