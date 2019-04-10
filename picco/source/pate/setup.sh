@@ -94,7 +94,7 @@ printf "    s1 = v1 + v2;\n" >> pate.c
 for (( ID=3; ID<=$NODES;  $ID++ ))
 do    
     printf "    s1 = v$(($ID)) + v$(($ID+1));\n" >> pate.c
-    $(($ID++))
+    $(($ID++)) #TODO: FIX THIS
 done
 
 
