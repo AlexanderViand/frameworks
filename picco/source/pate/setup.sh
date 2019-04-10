@@ -1,16 +1,22 @@
 #!/bin/bash 
 
-# Number of seperate nodes (=machines), including the aggregator (always ID 1)
+# Number of seperate nodes (=machines), including the aggregator (always highest id) but not the seed node
 NODES=11
 
+# do not modify!
+INPUT=$((NODES-1))
+OUTPUT=1
+
 # base_port, ports will be base_port+ID
-PORT=9100
+PORT=9200
 
 # Total number of logical teachers (=trained models)
 TEACHERS=250 
     
 TEACHERS_PER_NODE=$(( $TEACHERS / $NODES ))
 
+echo "Deleting old deployment"
+rm -rf deployment
 
 echo "Setting up $NODES nodes."
 mkdir -p deployment
@@ -48,7 +54,7 @@ do
     cd node$ID
 
     # Setting up smc_config
-    printf "modulus:48\ncomp-parties:$NODES\nthreshold:$(( ($NODES / 2 ) - 1 ))\ninput-parties:$(($NODES-1))\noutput-parties:1\n" > smc_config
+    printf "modulus:48\ncomp-parties:$NODES\nthreshold:$(( ($NODES / 2 ) - 1 ))\ninput-parties:$INPUT\noutput-parties:$OUTPUT\n" > smc_config
 
     # Setting up run_config
     for (( I=1; I<=$NODES; I++ ))
@@ -56,13 +62,18 @@ do
         printf "$I,127.0.0.1,$(($PORT+$I)),keys/pubkey$I.pem\n" > run_config
         #TODO: Make them use real ips rather than localhost
     done
-  
+    cd .. #back to deployment
+done
+
+for (( ID=1; ID<=$INPUT; ID++ ))
+do    
+    cd node$ID
     # Setting up input, hardcoded to ten classes for now
     echo "v$ID = 1,0,0,0,0,0,0,0,0,0\n" > input
     #TODO: Make vote random, or read it from file    
-
     cd .. #back to deployment
 done
+
 
 echo "Frankensteinifing the source code for the appropriate number of nodes"
 #TODO: ACTUALLY DO THIS!
@@ -77,18 +88,56 @@ do
 done
 
 echo "Generating input shares" 
-for (( ID=1; ID<=$NODES; ID++ ))
+for (( ID=1; ID<=$INPUT; ID++ ))
 do       
     cd node$ID
+
+    # Setting up input, hardcoded to ten classes for now
+    echo "v$ID = 1,0,0,0,0,0,0,0,0,0\n" > input 
+
+    # Generate input shares
     picco-utility -I $ID input util_config input${ID}share
-    #TODO: WILL FAIL UNTIL REAL SOURCE CODE MATCHES!!!
+    for (( I=1; I<=$NODES; I++ ))
+    do
+        mv input${ID}share$I ../node$I/input${ID}share$I
+    done
+
+
+
     cd .. #back to deployment
 done
 
-#TODO: Copy compute, compile 
+#TODO: Copy code, but compile on different machine?
+echo "Compiling code"
+cp -r ../picco picco
+cp node1/pategen.cpp picco/pategen.cpp
+cd picco
+make pategen
+cd .. # back to deployment
 
-#TODO: Run in descending order
+for (( ID=1; ID<=$NODES; ID++ ))
+do    
+    cp picco/pategen node$ID/pategen   
+done
 
+echo "Starting computational nodes"
+for (( ID=$NODES; ID >= 1; ID-- ))
+do       
+    cd node$ID
+    STRING="./pategen $(($ID)) run_config keys/private$(($ID)).pem $(($INPUT)) $(($OUTPUT))"
+    for (( I=1; I<=$(($INPUT)); I++ ))
+    do
+    STRING+=" input$(($I))share$(($ID))"
+    done
 
+    STRING+=" output &"
+    eval $STRING
 
+    cd .. #back to deployment
+done
 
+echo "Start seed"
+mkdir -p seed_node
+cd seed_node
+picco-seed run_config util_config
+cd .. #back to deployment
