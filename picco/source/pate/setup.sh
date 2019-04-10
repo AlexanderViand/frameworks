@@ -69,7 +69,7 @@ done
 for (( ID=1; ID<=$INPUT; ID++ ))
 do    
     cd node$ID
-    # Setting up input, hardcoded to ten classes for now
+    # Setting up input, hardcoded to ten classes
     echo "v$ID = 1,0,0,0,0,0,0,0,0,0\n" > input
     #TODO: Make vote random, or read it from file    
     cd .. #back to deployment
@@ -77,7 +77,29 @@ done
 
 
 echo "Frankensteinifing the source code for the appropriate number of nodes"
-#TODO: ACTUALLY DO THIS!
+printf "public int main() {\n" > pate.c
+printf "    private int<4> v1[10]" >> pate.c
+for (( ID=2; ID<=$NODES; ID++ ))
+do    
+    printf ", v$(($ID))[10]" >> pate.c
+done
+printf ";\n" >> pate.c
+for (( ID=1; ID<=$NODES; ID++ ))
+do    
+    printf "    smcinput(v$(($ID)),$(($ID)),10);\n" >> pate.c
+done
+printf "    private int<4> s1[10];\n" >> pate.c
+printf "    s1 = v1 + v2;\n" >> pate.c
+for (( ID=3; ID<=$NODES;  $ID++ ))
+do    
+    printf "    s1 = v$(($ID)) + v$(($ID+1));\n" >> pate.c
+    $(($ID++))
+done
+printf "    smcoutput(s1,1,10);\n    return 0;\n" >> pate.c
+
+
+#TODO in next part, actually use THIS pate rather than the hadnwritten one!
+
 
 echo "Transpiling code"
 for (( ID=1; ID<=$NODES; ID++ ))

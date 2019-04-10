@@ -30,7 +30,29 @@ public int main() {
     // s1 = s1 + v9;
     // s1 = s1 + v10;
 
-    smcoutput(s1,1,10);
+    
+    private int<4> max = 0;
+    for(int i = 0; i < 10; i++) {
+        if(s1[i] > max) {
+            max = s1[i];
+        }
+    }
+
+    //TODO: "Real" noise!
+    //private float max_with_noise = max + 1.416
+
+
+    
+    
+    
+    
+    
+    
+    
+    smcoutput(max,1,10);
+
+
+
     return 0;
 
 }
