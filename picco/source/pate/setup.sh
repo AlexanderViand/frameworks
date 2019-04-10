@@ -133,6 +133,8 @@ do
     STRING+=" output &"
     eval $STRING
 
+    sleep 1
+
     cd .. #back to deployment
 done
 
@@ -141,3 +143,11 @@ mkdir -p seed_node
 cd seed_node
 picco-seed run_config util_config
 cd .. #back to deployment
+
+echo "Recovering output"
+#TODO
+
+echo "Killing any leftover processes"
+pkill -f pategen
+
+echo "Done"
