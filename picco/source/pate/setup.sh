@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 # Number of seperate nodes (=machines), including the aggregator (always highest id) but not the seed node
-NODES=8
+NODES=5 #must be >=3 and odd at this point
 
 # do not modify!
 INPUT=$((NODES-1))
@@ -80,18 +80,18 @@ done
 echo "Frankensteinifing the source code for the appropriate number of nodes"
 printf "public int main() {\n" > pate.c
 printf "    private int<4> v1[10]" >> pate.c
-for (( ID=2; ID<=$NODES; ID++ ))
+for (( ID=2; ID<=$INPUT; ID++ ))
 do    
     printf ", v$(($ID))[10]" >> pate.c
 done
 printf ";\n" >> pate.c
-for (( ID=1; ID<=$NODES; ID++ ))
+for (( ID=1; ID<=$INPUT; ID++ ))
 do    
     printf "    smcinput(v$(($ID)),$(($ID)),10);\n" >> pate.c
 done
 printf "    private int<4> s1[10];\n" >> pate.c
 printf "    s1 = v1 + v2;\n" >> pate.c
-for (( ID=3; ID<=$NODES;  ID+=2 ))
+for (( ID=3; ID<=$INPUT;  ID+=2 ))
 do    
     printf "    s1 = v$(($ID)) + v$(($ID+1));\n" >> pate.c
 done
